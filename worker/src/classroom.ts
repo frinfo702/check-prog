@@ -4,11 +4,11 @@ import type { Env } from "./types";
 import { seatFor } from "./seatmap";
 
 type Kind = "question" | "check";
-/** 席("1A:l")ごとの呼び出し状態 */
+/** Call state per seat ("1A:l") */
 type Raised = Record<string, { question?: true; check?: true }>;
 
 /**
- * 教室ひとつぶんの共有状態。WebSocketで繋いだ全員に同じ座席表を配る。
+ * Shared state for one classroom. Every WebSocket client gets the same seat board.
  */
 export class Classroom extends DurableObject<Env> {
   async fetch(request: Request): Promise<Response> {
@@ -48,7 +48,7 @@ export class Classroom extends DurableObject<Env> {
     if (msg.type === "raise") {
       (raised[seat] ??= {})[msg.kind as Kind] = true;
     } else {
-      // 席ごとに持っているので、取り下げはその席だけ消える
+      // State is keyed by seat, so a withdraw clears only that seat
       delete raised[seat];
     }
     await this.ctx.storage.put("raised", raised);
@@ -65,7 +65,7 @@ export class Classroom extends DurableObject<Env> {
       try {
         ws.send(body);
       } catch {
-        // 閉じた接続は無視する
+        // Ignore connections that are already closed
       }
     }
   }

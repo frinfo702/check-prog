@@ -1,9 +1,9 @@
-"""学生番号→席の対応CSVから、HMAC化した照合表を worker/src/seat_map.json に書き出す。
+"""Write the HMAC lookup table to worker/src/seat_map.json from the student ID to desk CSV.
 
-実行例: uv run python utils/build_seat_map.py
-（SEATMAP_SECRET 環境変数か worker/.dev.vars の値を使います）
+Usage: uv run python utils/build_seat_map.py
+(Reads the SEATMAP_SECRET environment variable, or the value in worker/.dev.vars.)
 
-shortcut: 実行時の秘密鍵と同じ鍵で作り直す必要がある。鍵を変えたら再生成して再デプロイすること。
+shortcut: rebuild with the same secret the Worker runs with. Regenerate and redeploy when it changes.
 """
 
 import csv
@@ -47,7 +47,7 @@ def main() -> None:
 
     for desk_id, group in seats.items():
         for index, row in enumerate(group):
-            # 同じ机の上の行が左、次の行が右
+            # The first row of a desk is the left seat, the second is the right
             assert index < 2, f"1つの机に3人以上います: {desk_id}"
             student_id = row["student_ids"].strip()
             table[hmac.new(secret, student_id.encode(), hashlib.sha256).hexdigest()] = (

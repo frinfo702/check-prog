@@ -4,3 +4,11 @@ temp/
 **/node_modules/
 **/.wrangler/
 **/.dev.vars
+
+# terraform (stateは手元に置く)
+terraform/.terraform/
+terraform/*.tfstate*
+terraform/*.tfvars
+
+# wrangler --dry-run の出力 (terraform/main.tf が読む)
+worker/dist/

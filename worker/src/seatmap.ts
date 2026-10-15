@@ -17,7 +17,7 @@ function hmacKey(secret: string): Promise<CryptoKey> {
   return key;
 }
 
-/** 学籍番号から席を引く。値は "1A:l" のように机と左右を持つ。学籍番号そのものは保存しない。 */
+/** Look up a seat by student ID. The value is "<desk>:<side>" such as "1A:l". The ID itself is never stored. */
 export async function seatFor(
   secret: string,
   studentId: string,

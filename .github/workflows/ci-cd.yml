@@ -1,0 +1,97 @@
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # setup-uv has no moving v10 tag, so pin the commit
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run ruff check
+      - run: uv run pytest
+
+  worker:
+    runs-on: ubuntu-latest
+    env:
+      WRANGLER_SEND_METRICS: "false"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - name: 依存を入れる
+        run: npm ci
+        working-directory: worker
+      - name: 型チェック
+        run: npm run typecheck
+        working-directory: worker
+
+      # data/ is not tracked in git, so rebuild the lookup table with fake IDs for the smoke test
+      - name: 仮の照合表を作る
+        run: |
+          mkdir -p data
+          printf 'student_ids,desk_id\n11111111,1A\n22222222,1A\n' > data/student_ids_with_desk_ids.csv
+          printf 'SEATMAP_SECRET=ci-only-secret\n' > worker/.dev.vars
+          python3 utils/build_seat_map.py
+
+      - name: devを起動してスモークテスト
+        working-directory: worker
+        run: |
+          npx wrangler dev --port 8787 &
+          for _ in $(seq 60); do
+            curl -fsS http://127.0.0.1:8787/ > /dev/null && break
+            sleep 1
+          done
+          npm test
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: [python, worker]
+    runs-on: ubuntu-latest
+    env:
+      WRANGLER_SEND_METRICS: "false"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - name: 依存を入れる
+        run: npm ci
+        working-directory: worker
+      - name: デプロイ
+        run: npx wrangler deploy
+        working-directory: worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: 配信後の確認
+        env:
+          WORKER_URL: ${{ vars.WORKER_URL }}
+        run: |
+          WORKER_URL=${WORKER_URL%/}
+          if [ -z "$WORKER_URL" ]; then
+            echo "リポジトリ変数 WORKER_URL が未設定なので確認を省きます"
+            exit 0
+          fi
+          curl -fsS "$WORKER_URL/" | grep -qi '<!doctype html'
+          # A missing SEATMAP_SECRET binding returns 500; an unknown student ID must return 404
+          curl -sS -X POST "$WORKER_URL/api/lookup" \
+            -H 'content-type: application/json' \
+            -d '{"student_id":"99999999"}' | grep -q not_found
