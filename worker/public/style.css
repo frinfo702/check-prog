@@ -77,6 +77,25 @@ body {
   color: var(--paper);
 }
 
+/* Repository link, pushed to the right end of the header */
+.repo {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.repo:hover {
+  color: var(--ink);
+}
+
+.repo svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
