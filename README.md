@@ -45,6 +45,8 @@ GitHub側に登録するもの:
 
 `SEATMAP_SECRET` はCloudflare側にだけ置き、CIには渡しません。初回だけ手元で `cd worker && npx wrangler secret put SEATMAP_SECRET` を実行し、照合表を作ったときと同じ値を入れてください。
 
+配信先は `https://check-prog.<アカウントのworkers.devサブドメイン>.workers.dev` です。`WORKER_URL` にはこのURLを入れてください。Terraformでスクリプトを上げるだけではworkers.devのルートが有効にならず(エラー1042)、`terraform/main.tf` の `cloudflare_workers_script_subdomain` がそれを有効にします。
+
 配信後の確認では、`/` がHTMLを返すことと、未登録の学籍番号が404になること(秘密鍵のbindingが残っていること)を見ています。
 
 # Terraform (手元での確認用)

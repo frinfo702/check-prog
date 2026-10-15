@@ -59,3 +59,12 @@ resource "cloudflare_workers_script" "check_prog" {
   # Keep the SEATMAP_SECRET that was set with wrangler secret put
   keep_bindings = ["secret_text"]
 }
+
+# Matches wrangler's default workers_dev = true. Uploading only the script leaves the
+# workers.dev route disabled, which answers error 1042.
+resource "cloudflare_workers_script_subdomain" "check_prog" {
+  account_id       = var.account_id
+  script_name      = cloudflare_workers_script.check_prog.script_name
+  enabled          = true
+  previews_enabled = true
+}
