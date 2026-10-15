@@ -29,7 +29,7 @@ for (const row of ROWS) {
     el.className = "desk";
     if (col === 10) el.classList.add("ta-seat");
     el.dataset.desk = desk;
-    // 机ひとつは左右2席に分かれている
+    // Each desk is split into a left and a right seat
     el.innerHTML = `<span class="half left" aria-hidden="true"><span class="flags"></span></span><span class="half right" aria-hidden="true"><span class="flags"></span></span><span class="name">${desk}</span>`;
     mapEl.append(el);
   }
@@ -104,7 +104,7 @@ async function withStore(mode, fn) {
   });
 }
 
-/** 取り出し不可の鍵をIndexedDBに置き、暗号文だけをlocalStorageに保存する。 */
+/** Keep the non-extractable key in IndexedDB and only the ciphertext in localStorage. */
 async function getKey() {
   const key = await withStore("readonly", (store) => store.get("main"));
   if (key) return key;
@@ -135,7 +135,7 @@ async function saveId(id) {
       JSON.stringify({ iv: toBase64(iv), ct: toBase64(new Uint8Array(cipher)) }),
     );
   } catch {
-    // 保存に失敗しても照合と挙手には影響しない
+    // Failing to save does not affect lookup or raising a hand
   }
 }
 
@@ -200,11 +200,11 @@ document.getElementById("withdraw").addEventListener("click", () =>
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/** 呼び出し中なら取り下げが反映されるのを待つ。入力し直す前に使う。 */
+/** Wait until a withdraw takes effect, before the user enters their ID again. */
 async function withdrawMine() {
   if (!studentId || !mySeat || !raised[mySeat]) return;
   const deadline = Date.now() + 4000;
-  // 接続が切れていたら、再接続を少し待つ
+  // The socket may be reconnecting; give it a moment
   while ((!ws || ws.readyState !== WebSocket.OPEN) && Date.now() < deadline) {
     await wait(100);
   }

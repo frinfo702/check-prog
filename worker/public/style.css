@@ -1,5 +1,5 @@
-/* 教室に貼ってある座席表をそのまま画面にした、という見た目にする。
-   図面の記号(窓側の引き違い線、廊下側の破線、赤いTA席)をそのまま使う。 */
+/* Looks like the seat chart taped up in the classroom, redrawn on screen.
+   Reuses the drawing's own symbols: window-side sliding line, corridor dashes, red TA seats. */
 
 :root {
   color-scheme: light;
@@ -13,7 +13,7 @@
   --line-soft: #e2e4df;
   --question: #1d4ed8;
   --check: #c8102e;
-  --red: #c8102e; /* TA席やエラーなど、図面の赤 */
+  --red: #c8102e; /* The drawing's red, for TA seats and errors */
 
   --font: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic",
     "Noto Sans JP", sans-serif;
@@ -85,7 +85,7 @@ body {
   padding: 24px;
 }
 
-/* 図面(座席表) */
+/* The drawing (seat map) */
 
 .plan {
   padding: clamp(12px, 1.4vw, 20px);
@@ -132,7 +132,7 @@ body {
   border-color: var(--check);
 }
 
-/* 窓側の引き違い線 */
+/* Window-side sliding line */
 .window-bar {
   height: 9px;
   border-top: 1.5px solid var(--ink);
@@ -174,7 +174,7 @@ body {
   background: var(--desk);
 }
 
-/* 机ひとつは左右2席。左がCSVの上の行 */
+/* One desk holds two seats; the left one is the earlier CSV row */
 .desk .half {
   display: flex;
   align-items: flex-end;
@@ -187,7 +187,7 @@ body {
   border-left: 1px solid var(--line-soft);
 }
 
-/* 机の番号は、塗られた席の上でも読めるように紙色の札で出す */
+/* Desk numbers sit on a paper-colored tag so they stay readable on a filled seat */
 .desk .name {
   position: absolute;
   top: 50%;
@@ -217,7 +217,7 @@ body {
   display: none;
 }
 
-/* 呼び出し中は席の半分を塗る。離れた席からも色で分かるように。 */
+/* Half the desk is filled while called, so the color reads from across the room */
 .desk .half.q {
   background-color: var(--question);
   color: var(--paper);
@@ -236,7 +236,7 @@ body {
   );
 }
 
-/* 自分の席は図面の斜線で示す */
+/* Mark your own seat with the hatching used on drawings */
 .desk .half.mine {
   box-shadow: inset 0 0 0 2px var(--ink);
   background-image: repeating-linear-gradient(
@@ -259,7 +259,7 @@ body {
   );
 }
 
-/* 10A〜10E はTAなどの席。教室と見た目を合わせるために表示だけする。 */
+/* 10A-10E are TA seats, drawn only to match the room */
 .desk.ta-seat {
   border-color: var(--red);
   background: var(--paper);
@@ -289,7 +289,7 @@ body {
   letter-spacing: 0.14em;
 }
 
-/* 操作 */
+/* Controls */
 
 .rail {
   display: grid;
@@ -446,7 +446,7 @@ button {
   outline-offset: 2px;
 }
 
-/* 案内 */
+/* Info dialog */
 
 dialog {
   max-width: 480px;
@@ -491,7 +491,7 @@ dialog ul {
   }
 }
 
-/* 席が狭くなったら文字は入らないので、色だけで伝える */
+/* Narrow seats cannot fit labels, so color alone carries the state */
 @container (max-width: 1100px) {
   .desk .flags {
     display: none;

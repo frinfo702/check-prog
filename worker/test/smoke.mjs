@@ -1,5 +1,5 @@
-// 起動中の `npm run dev` に対して、照合・挙手・取り下げの共有を確認する。
-// 実行例: node test/smoke.mjs
+// Checks lookup, raise and withdraw sharing against a running `npm run dev`.
+// Usage: node test/smoke.mjs
 import { readFileSync } from "node:fs";
 
 const base = process.env.BASE ?? "http://127.0.0.1:8787";
@@ -70,7 +70,7 @@ function openSocket() {
   return { ws, ready, nextState, send };
 }
 
-// 自分と、同じ画面を見ている別のブラウザの2枚で確認する
+// Two clients: this browser and another one watching the same board
 const mine = openSocket();
 const other = openSocket();
 await Promise.all([mine.ready, other.ready]);
