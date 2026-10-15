@@ -81,11 +81,8 @@ body {
 .repo {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
   margin-left: auto;
   color: var(--ink-soft);
-  font-family: var(--mono);
-  font-size: 12px;
   text-decoration: none;
 }
 
@@ -94,8 +91,8 @@ body {
 }
 
 .repo svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   fill: currentColor;
 }
 
@@ -516,13 +513,6 @@ dialog ul {
 /* Narrow seats cannot fit labels, so color alone carries the state */
 @container (max-width: 1100px) {
   .desk .flags {
-    display: none;
-  }
-}
-
-/* On phones the icon alone links to the repository */
-@media (max-width: 640px) {
-  .repo-url {
     display: none;
   }
 }
