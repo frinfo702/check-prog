@@ -311,5 +311,5 @@ const svg = k.figureSvg({
   ],
 });
 
-writeFileSync(join(HERE, "f1-mac.svg"), svg);
+writeFileSync(join(HERE, "f1-mac.svg"), svg.replace("<svg ", `<svg width="${WIDTH}" height="${HEIGHT}" `));
 console.log("wrote f1-mac.svg", `${(svg.length / 1024).toFixed(1)} KB`);
