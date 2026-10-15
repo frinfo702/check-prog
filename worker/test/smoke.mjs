@@ -17,21 +17,25 @@ const rows = readFileSync(
   .split("\n")
   .slice(1)
   .map((line) => line.split(",").map((field) => field.trim()));
-const [studentId, desk] = rows[0];
+const [leftId, desk] = rows[0];
+const [rightId] = rows[1];
 
-const lookup = await fetch(`${base}/api/lookup`, {
-  method: "POST",
-  headers: { "content-type": "application/json" },
-  body: JSON.stringify({ student_id: studentId }),
-});
-const found = await lookup.json();
-assert(lookup.status === 200 && found.desk === desk, `照合: ${desk}`);
+async function lookup(studentId) {
+  const res = await fetch(`${base}/api/lookup`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ student_id: studentId }),
+  });
+  return { status: res.status, body: await res.json() };
+}
 
-const missing = await fetch(`${base}/api/lookup`, {
-  method: "POST",
-  headers: { "content-type": "application/json" },
-  body: JSON.stringify({ student_id: "1" }),
-});
+const left = await lookup(leftId);
+assert(left.status === 200 && left.body.desk === desk && left.body.side === "l", `照合: ${desk} 左`);
+
+const right = await lookup(rightId);
+assert(right.body.desk === desk && right.body.side === "r", `同じ机の次の行は ${desk} 右`);
+
+const missing = await lookup("1");
 assert(missing.status === 404, "未登録の学籍番号は404");
 
 function openSocket() {
@@ -73,13 +77,27 @@ await Promise.all([mine.ready, other.ready]);
 assert((await mine.nextState()).type === "state", "接続直後に現在の状態が届く");
 await other.nextState();
 
-mine.send({ type: "raise", student_id: studentId, kind: "question" });
-assert((await mine.nextState()).raised[desk]?.question === true, `挙手が ${desk} に反映される`);
-assert((await other.nextState()).raised[desk]?.question === true, "挙手が他のブラウザにも届く");
+const leftSeat = `${desk}:l`;
+const rightSeat = `${desk}:r`;
 
-other.send({ type: "withdraw", student_id: studentId });
-assert(!(desk in (await other.nextState()).raised), `取り下げが ${desk} に反映される`);
-assert(!(desk in (await mine.nextState()).raised), "取り下げも他のブラウザに届く");
+mine.send({ type: "raise", student_id: leftId, kind: "question" });
+assert((await mine.nextState()).raised[leftSeat]?.question === true, `左の席の挙手が ${desk} に反映される`);
+assert((await other.nextState()).raised[leftSeat]?.question === true, "挙手が他のブラウザにも届く");
+
+other.send({ type: "raise", student_id: rightId, kind: "review" });
+assert((await other.nextState()).raised[rightSeat]?.review === true, "同じ机の右の席も別に呼べる");
+assert((await mine.nextState()).raised[leftSeat]?.question === true, "右の挙手で左の席は消えない");
+
+other.send({ type: "withdraw", student_id: rightId });
+const clearedRight = await other.nextState();
+assert(!(rightSeat in clearedRight.raised), "右の取り下げが反映される");
+assert(leftSeat in clearedRight.raised, "右の取り下げで左の席は消えない");
+await mine.nextState();
+
+mine.send({ type: "withdraw", student_id: leftId });
+const clearedLeft = await mine.nextState();
+assert(!(leftSeat in clearedLeft.raised), "左の取り下げが反映される");
+await other.nextState();
 
 mine.ws.close();
 other.ws.close();

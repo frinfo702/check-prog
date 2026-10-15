@@ -1,5 +1,6 @@
 **/__pycache__/*
 data/
+temp/
 **/node_modules/
 **/.wrangler/
 **/.dev.vars

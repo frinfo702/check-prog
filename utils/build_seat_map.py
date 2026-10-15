@@ -39,13 +39,20 @@ def main() -> None:
         rows = list(csv.DictReader(f))
 
     table = {}
+    seats: dict[str, list[dict]] = {}
     for row in rows:
-        student_id = row["student_ids"].strip()
         desk_id = row["desk_id"].strip()
         assert desk_id[:2] != "10", f"10列はTA席なので割り当てできません: {desk_id}"
-        table[hmac.new(secret, student_id.encode(), hashlib.sha256).hexdigest()] = (
-            desk_id
-        )
+        seats.setdefault(desk_id, []).append(row)
+
+    for desk_id, group in seats.items():
+        for index, row in enumerate(group):
+            # 同じ机の上の行が左、次の行が右
+            assert index < 2, f"1つの机に3人以上います: {desk_id}"
+            student_id = row["student_ids"].strip()
+            table[hmac.new(secret, student_id.encode(), hashlib.sha256).hexdigest()] = (
+                f"{desk_id}:{'lr'[index]}"
+            )
 
     assert len(table) == len(rows), "学籍番号が重複しています"
 

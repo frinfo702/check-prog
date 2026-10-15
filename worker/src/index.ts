@@ -1,5 +1,5 @@
 import type { Env } from "./types";
-import { deskFor } from "./seatmap";
+import { seatFor } from "./seatmap";
 
 export { Classroom } from "./classroom";
 
@@ -15,9 +15,10 @@ export default {
       const body = (await request.json().catch(() => null)) as {
         student_id?: string;
       } | null;
-      const desk = await deskFor(env.SEATMAP_SECRET, body?.student_id ?? "");
-      if (!desk) return Response.json({ error: "not_found" }, { status: 404 });
-      return Response.json({ desk });
+      const seat = await seatFor(env.SEATMAP_SECRET, body?.student_id ?? "");
+      if (!seat) return Response.json({ error: "not_found" }, { status: 404 });
+      const [desk, side] = seat.split(":");
+      return Response.json({ desk, side });
     }
 
     return new Response("Not found", { status: 404 });

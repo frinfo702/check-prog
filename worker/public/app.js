@@ -8,10 +8,17 @@ const idForm = document.getElementById("idForm");
 const sidInput = document.getElementById("sid");
 const meEl = document.getElementById("me");
 const myDeskEl = document.getElementById("myDesk");
+const mySideEl = document.getElementById("mySide");
 const statusEl = document.getElementById("status");
 
+const SIDES = [
+  { key: "l", className: "left" },
+  { key: "r", className: "right" },
+];
+const SIDE_LABEL = { l: "左", r: "右" };
+
 let studentId = null;
-let myDesk = null;
+let mySeat = null;
 let raised = {};
 let ws = null;
 
@@ -22,24 +29,29 @@ for (const row of ROWS) {
     el.className = "desk";
     if (col === 10) el.classList.add("ta-seat");
     el.dataset.desk = desk;
-    el.innerHTML = `<span class="name">${desk}</span><span class="flags"></span>`;
+    // 机ひとつは左右2席に分かれている
+    el.innerHTML = `<span class="half left" aria-hidden="true"><span class="flags"></span></span><span class="half right" aria-hidden="true"><span class="flags"></span></span><span class="name">${desk}</span>`;
     mapEl.append(el);
   }
 }
 
 function render() {
   for (const el of mapEl.children) {
-    const state = raised[el.dataset.desk];
-    el.classList.toggle("q", Boolean(state?.question));
-    el.classList.toggle("r", Boolean(state?.review));
-    el.classList.toggle("mine", el.dataset.desk === myDesk);
-    el.querySelector(".flags").textContent = state
-      ? [state.question && "質問", state.review && "レビュー"]
-          .filter(Boolean)
-          .join("\n")
-      : "";
+    for (const { key, className } of SIDES) {
+      const half = el.querySelector(`.half.${className}`);
+      const seat = `${el.dataset.desk}:${key}`;
+      const state = raised[seat];
+      half.classList.toggle("q", Boolean(state?.question));
+      half.classList.toggle("r", Boolean(state?.review));
+      half.classList.toggle("mine", seat === mySeat);
+      half.querySelector(".flags").textContent = state
+        ? [state.question && "質問", state.review && "レビュー"]
+            .filter(Boolean)
+            .join("\n")
+        : "";
+    }
   }
-  const mine = raised[myDesk];
+  const mine = raised[mySeat];
   statusEl.textContent = mine
     ? `この席は ${[mine.question && "質問", mine.review && "レビュー"].filter(Boolean).join(" と ")} で呼び出し中です。`
     : "";
@@ -155,10 +167,11 @@ async function lookup(id) {
     showError("学籍番号が見つかりません。入力した番号を確認してください。");
     return;
   }
-  const { desk } = await res.json();
+  const { desk, side } = await res.json();
   studentId = id;
-  myDesk = desk;
+  mySeat = `${desk}:${side}`;
   myDeskEl.textContent = desk;
+  mySideEl.textContent = SIDE_LABEL[side] ?? "";
   idForm.hidden = true;
   meEl.hidden = false;
   saveId(id);
@@ -184,7 +197,24 @@ document.getElementById("raiseReview").addEventListener("click", () =>
 document.getElementById("withdraw").addEventListener("click", () =>
   send({ type: "withdraw", student_id: studentId }),
 );
-document.getElementById("reset").addEventListener("click", () => {
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** 呼び出し中なら取り下げが反映されるのを待つ。入力し直す前に使う。 */
+async function withdrawMine() {
+  if (!studentId || !mySeat || !raised[mySeat]) return;
+  const deadline = Date.now() + 4000;
+  // 接続が切れていたら、再接続を少し待つ
+  while ((!ws || ws.readyState !== WebSocket.OPEN) && Date.now() < deadline) {
+    await wait(100);
+  }
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  send({ type: "withdraw", student_id: studentId });
+  while (raised[mySeat] && Date.now() < deadline) await wait(50);
+}
+
+document.getElementById("reset").addEventListener("click", async () => {
+  await withdrawMine();
   localStorage.removeItem(STORAGE_KEY);
   location.reload();
 });

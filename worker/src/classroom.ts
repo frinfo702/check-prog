@@ -1,9 +1,10 @@
 import { DurableObject } from "cloudflare:workers";
 
 import type { Env } from "./types";
-import { deskFor } from "./seatmap";
+import { seatFor } from "./seatmap";
 
 type Kind = "question" | "review";
+/** 席("1A:l")ごとの呼び出し状態 */
 type Raised = Record<string, { question?: true; review?: true }>;
 
 /**
@@ -35,8 +36,8 @@ export class Classroom extends DurableObject<Env> {
     if (msg.kind !== undefined && msg.kind !== "question" && msg.kind !== "review")
       return;
 
-    const desk = await deskFor(this.env.SEATMAP_SECRET, msg.student_id ?? "");
-    if (!desk) {
+    const seat = await seatFor(this.env.SEATMAP_SECRET, msg.student_id ?? "");
+    if (!seat) {
       ws.send(
         JSON.stringify({ type: "error", message: "学籍番号が見つかりません" }),
       );
@@ -45,10 +46,10 @@ export class Classroom extends DurableObject<Env> {
 
     const raised = await this.raised();
     if (msg.type === "raise") {
-      (raised[desk] ??= {})[msg.kind as Kind] = true;
-    } else if (raised[desk]) {
-      // 机を単位に持っているので、取り下げはその机の2人ぶんまとめて消える
-      delete raised[desk];
+      (raised[seat] ??= {})[msg.kind as Kind] = true;
+    } else {
+      // 席ごとに持っているので、取り下げはその席だけ消える
+      delete raised[seat];
     }
     await this.ctx.storage.put("raised", raised);
     this.broadcast({ type: "state", raised });

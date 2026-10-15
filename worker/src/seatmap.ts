@@ -17,8 +17,8 @@ function hmacKey(secret: string): Promise<CryptoKey> {
   return key;
 }
 
-/** 学籍番号から席を引く。学籍番号そのものは保存しない。 */
-export async function deskFor(
+/** 学籍番号から席を引く。値は "1A:l" のように机と左右を持つ。学籍番号そのものは保存しない。 */
+export async function seatFor(
   secret: string,
   studentId: string,
 ): Promise<string | null> {
