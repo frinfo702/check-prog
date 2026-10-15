@@ -11,8 +11,9 @@
   --ink-soft: #5d636d;
   --line: #c7cac4;
   --line-soft: #e2e4df;
-  --question: #c8102e;
-  --review: #1d4ed8;
+  --question: #1d4ed8;
+  --check: #c8102e;
+  --red: #c8102e; /* TA席やエラーなど、図面の赤 */
 
   --font: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic",
     "Noto Sans JP", sans-serif;
@@ -126,9 +127,9 @@ body {
   border-color: var(--question);
 }
 
-.swatch.r {
-  background: var(--review);
-  border-color: var(--review);
+.swatch.c {
+  background: var(--check);
+  border-color: var(--check);
 }
 
 /* 窓側の引き違い線 */
@@ -222,16 +223,16 @@ body {
   color: var(--paper);
 }
 
-.desk .half.r {
-  background-color: var(--review);
+.desk .half.c {
+  background-color: var(--check);
   color: var(--paper);
 }
 
-.desk .half.q.r {
+.desk .half.q.c {
   background-image: linear-gradient(
     105deg,
     var(--question) 0 50%,
-    var(--review) 50% 100%
+    var(--check) 50% 100%
   );
 }
 
@@ -246,26 +247,26 @@ body {
 }
 
 .desk .half.mine.q,
-.desk .half.mine.r {
+.desk .half.mine.c {
   background-image: none;
 }
 
-.desk .half.mine.q.r {
+.desk .half.mine.q.c {
   background-image: linear-gradient(
     105deg,
     var(--question) 0 50%,
-    var(--review) 50% 100%
+    var(--check) 50% 100%
   );
 }
 
 /* 10A〜10E はTAなどの席。教室と見た目を合わせるために表示だけする。 */
 .desk.ta-seat {
-  border-color: var(--question);
+  border-color: var(--red);
   background: var(--paper);
 }
 
 .desk.ta-seat .name {
-  color: var(--question);
+  color: var(--red);
   letter-spacing: 0.06em;
 }
 
@@ -281,8 +282,8 @@ body {
 
 .ta {
   padding: 6px 16px;
-  border: 1.5px solid var(--question);
-  color: var(--question);
+  border: 1.5px solid var(--red);
+  color: var(--red);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -384,13 +385,13 @@ button {
   color: var(--paper);
 }
 
-.actions .r {
-  border-color: var(--review);
-  color: var(--review);
+.actions .c {
+  border-color: var(--check);
+  color: var(--check);
 }
 
-.actions .r:hover {
-  background: var(--review);
+.actions .c:hover {
+  background: var(--check);
   color: var(--paper);
 }
 
@@ -431,7 +432,7 @@ button {
 
 .err {
   margin: 0;
-  color: var(--question);
+  color: var(--red);
   font-size: 14px;
   font-weight: 700;
 }
@@ -441,7 +442,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--review);
+  outline: 2px solid var(--question);
   outline-offset: 2px;
 }
 

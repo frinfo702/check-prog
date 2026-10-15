@@ -84,8 +84,8 @@ mine.send({ type: "raise", student_id: leftId, kind: "question" });
 assert((await mine.nextState()).raised[leftSeat]?.question === true, `左の席の挙手が ${desk} に反映される`);
 assert((await other.nextState()).raised[leftSeat]?.question === true, "挙手が他のブラウザにも届く");
 
-other.send({ type: "raise", student_id: rightId, kind: "review" });
-assert((await other.nextState()).raised[rightSeat]?.review === true, "同じ机の右の席も別に呼べる");
+other.send({ type: "raise", student_id: rightId, kind: "check" });
+assert((await other.nextState()).raised[rightSeat]?.check === true, "同じ机の右の席も別に呼べる");
 assert((await mine.nextState()).raised[leftSeat]?.question === true, "右の挙手で左の席は消えない");
 
 other.send({ type: "withdraw", student_id: rightId });

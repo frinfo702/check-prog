@@ -3,9 +3,9 @@ import { DurableObject } from "cloudflare:workers";
 import type { Env } from "./types";
 import { seatFor } from "./seatmap";
 
-type Kind = "question" | "review";
+type Kind = "question" | "check";
 /** 席("1A:l")ごとの呼び出し状態 */
-type Raised = Record<string, { question?: true; review?: true }>;
+type Raised = Record<string, { question?: true; check?: true }>;
 
 /**
  * 教室ひとつぶんの共有状態。WebSocketで繋いだ全員に同じ座席表を配る。
@@ -33,7 +33,7 @@ export class Classroom extends DurableObject<Env> {
       return;
     }
     if (msg.type !== "raise" && msg.type !== "withdraw") return;
-    if (msg.kind !== undefined && msg.kind !== "question" && msg.kind !== "review")
+    if (msg.kind !== undefined && msg.kind !== "question" && msg.kind !== "check")
       return;
 
     const seat = await seatFor(this.env.SEATMAP_SECRET, msg.student_id ?? "");

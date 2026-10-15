@@ -42,10 +42,10 @@ function render() {
       const seat = `${el.dataset.desk}:${key}`;
       const state = raised[seat];
       half.classList.toggle("q", Boolean(state?.question));
-      half.classList.toggle("r", Boolean(state?.review));
+      half.classList.toggle("c", Boolean(state?.check));
       half.classList.toggle("mine", seat === mySeat);
       half.querySelector(".flags").textContent = state
-        ? [state.question && "質問", state.review && "レビュー"]
+        ? [state.question && "質問", state.check && "チェック"]
             .filter(Boolean)
             .join("\n")
         : "";
@@ -53,7 +53,7 @@ function render() {
   }
   const mine = raised[mySeat];
   statusEl.textContent = mine
-    ? `この席は ${[mine.question && "質問", mine.review && "レビュー"].filter(Boolean).join(" と ")} で呼び出し中です。`
+    ? `この席は ${[mine.question && "質問", mine.check && "チェック"].filter(Boolean).join(" と ")} で呼び出し中です。`
     : "";
 }
 
@@ -191,8 +191,8 @@ idForm.addEventListener("submit", (event) => {
 document.getElementById("raiseQuestion").addEventListener("click", () =>
   send({ type: "raise", student_id: studentId, kind: "question" }),
 );
-document.getElementById("raiseReview").addEventListener("click", () =>
-  send({ type: "raise", student_id: studentId, kind: "review" }),
+document.getElementById("raiseCheck").addEventListener("click", () =>
+  send({ type: "raise", student_id: studentId, kind: "check" }),
 );
 document.getElementById("withdraw").addEventListener("click", () =>
   send({ type: "withdraw", student_id: studentId }),

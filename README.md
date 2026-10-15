@@ -1,6 +1,6 @@
 # What is available
 
-This respository is built for managing the review system for Programming Exercise 1 (F1)!
+This respository is built for managing the check system for Programming Exercise 1 (F1)!
 You can easily call teaching assistant or educational supporter from screen.
 
 # What this use
