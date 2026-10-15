@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "check-prog",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-01-01",
+  "assets": {
+    "directory": "public"
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "CLASSROOM", "class_name": "Classroom" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Classroom"] }]
+}

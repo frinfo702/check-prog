@@ -1,0 +1,3 @@
+# 学籍番号の照合に使う秘密鍵。openssl rand -hex 32 などで生成する。
+# 本番は wrangler secret put SEATMAP_SECRET で同じ値を設定する。
+SEATMAP_SECRET=replace-with-openssl-rand-hex-32

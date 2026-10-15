@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>F1 チェック 呼び出し</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="top">
+      <h1><span class="code">F1</span>チェック呼び出し</h1>
+      <button id="infoButton" aria-label="学籍番号の扱いについて">i</button>
+    </header>
+
+    <div class="layout">
+      <main class="plan">
+        <div class="plan-head">
+          <span class="wall-label">窓側</span>
+          <span class="legend">
+            <i class="swatch q"></i>質問
+            <i class="swatch r"></i>レビュー
+          </span>
+        </div>
+
+        <div class="window-bar" aria-hidden="true"></div>
+
+        <div class="map-scroll">
+          <div id="map" class="map" aria-label="座席表"></div>
+        </div>
+
+        <div class="corridor">
+          <span class="wall-label">廊下側</span>
+          <span class="ta">TA席</span>
+        </div>
+      </main>
+
+      <aside class="rail">
+        <form id="idForm" class="card">
+          <label for="sid">学籍番号</label>
+          <input
+            id="sid"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="26002604743"
+          />
+          <button type="submit">自分の席を表示</button>
+        </form>
+
+        <p id="err" class="err" role="alert"></p>
+
+        <div id="me" class="card" hidden>
+          <p class="seat-label">あなたの席</p>
+          <p class="seat"><strong id="myDesk"></strong></p>
+
+          <div class="actions">
+            <button id="raiseQuestion" class="q">質問で呼ぶ</button>
+            <button id="raiseReview" class="r">レビューで呼ぶ</button>
+            <button id="withdraw" class="ghost">取り下げ</button>
+          </div>
+
+          <p id="status" class="status"></p>
+          <button id="reset" class="link">学籍番号を入力し直す</button>
+        </div>
+      </aside>
+    </div>
+
+    <dialog id="infoDialog">
+      <h2>学籍番号の扱い</h2>
+      <ul>
+        <li>学籍番号は、あなたの席を照合するためだけに使います。サーバーには保存しません。</li>
+        <li>他の学生に、あなたの学籍番号が見えることはありません。</li>
+        <li>学籍番号はMoodleから取得したもので、この授業の運営以外には使用しません。</li>
+        <li>入力した学籍番号は、このブラウザの中に暗号化して保存され、次回の入力が不要になります。</li>
+      </ul>
+      <button id="infoClose">閉じる</button>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>

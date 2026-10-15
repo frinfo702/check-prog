@@ -1,0 +1,480 @@
+/* 教室に貼ってある座席表をそのまま画面にした、という見た目にする。
+   図面の記号(窓側の引き違い線、廊下側の破線、赤いTA席)をそのまま使う。 */
+
+:root {
+  color-scheme: light;
+
+  --paper: #ffffff;
+  --desk: #fdfdfb;
+  --page: #edeeea;
+  --ink: #16181d;
+  --ink-soft: #5d636d;
+  --line: #c7cac4;
+  --line-soft: #e2e4df;
+  --question: #c8102e;
+  --review: #1d4ed8;
+
+  --font: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic",
+    "Noto Sans JP", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, "Roboto Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font);
+  line-height: 1.5;
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 16px 24px;
+  border-bottom: 1.5px solid var(--ink);
+  background: var(--paper);
+}
+
+.top h1 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.top .code {
+  font-family: var(--mono);
+  margin-right: 10px;
+}
+
+#infoButton {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  background: none;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#infoButton:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+  padding: 24px;
+}
+
+/* 図面(座席表) */
+
+.plan {
+  padding: clamp(12px, 1.4vw, 20px);
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+}
+
+.plan-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.wall-label {
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.08em;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.swatch {
+  width: 11px;
+  height: 11px;
+  margin-left: 10px;
+  border: 1px solid var(--line);
+}
+
+.swatch.q {
+  background: var(--question);
+  border-color: var(--question);
+}
+
+.swatch.r {
+  background: var(--review);
+  border-color: var(--review);
+}
+
+/* 窓側の引き違い線 */
+.window-bar {
+  height: 9px;
+  border-top: 1.5px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 48px,
+    var(--ink) 48px 50px
+  );
+}
+
+.map-scroll {
+  container-type: inline-size;
+  overflow-x: auto;
+}
+
+.map {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: clamp(3px, 0.45vw, 8px);
+  padding: clamp(8px, 1vw, 14px) 0;
+  background-image: linear-gradient(
+      to right,
+      rgba(22, 24, 29, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(22, 24, 29, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.desk {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  aspect-ratio: 5 / 4;
+  min-width: 0;
+  overflow: hidden;
+  padding: 2px;
+  border: 1px solid var(--line);
+  background: var(--desk);
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.desk .name {
+  font-family: var(--mono);
+  font-size: clamp(11px, 2.1vw, 24px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.desk .flags {
+  white-space: pre-line;
+  line-height: 1.2;
+  font-size: clamp(9px, 1.4vw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.desk .flags:empty {
+  display: none;
+}
+
+/* 呼び出し中は面で塗る。離れた席からも色で分かるように。 */
+.desk.q {
+  border-color: var(--question);
+  background-color: var(--question);
+  color: var(--paper);
+}
+
+.desk.r {
+  border-color: var(--review);
+  background-color: var(--review);
+  color: var(--paper);
+}
+
+.desk.q.r {
+  border-color: var(--ink);
+  background-image: linear-gradient(
+    105deg,
+    var(--question) 0 50%,
+    var(--review) 50% 100%
+  );
+}
+
+/* 自分の席は図面の斜線で示す */
+.desk.mine {
+  border: 2px solid var(--ink);
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(22, 24, 29, 0.07) 0 5px,
+    transparent 5px 10px
+  );
+}
+
+.desk.mine.q,
+.desk.mine.r {
+  background-image: none;
+}
+
+.desk.mine.q.r {
+  background-image: linear-gradient(
+    105deg,
+    var(--question) 0 50%,
+    var(--review) 50% 100%
+  );
+}
+
+/* 10A〜10E はTAなどの席。教室と見た目を合わせるために表示だけする。 */
+.desk.ta-seat {
+  border-color: var(--question);
+  background: var(--paper);
+}
+
+.desk.ta-seat .name {
+  color: var(--question);
+  letter-spacing: 0.06em;
+}
+
+.corridor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1.5px dashed var(--line);
+}
+
+.ta {
+  padding: 6px 16px;
+  border: 1.5px solid var(--question);
+  color: var(--question);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+/* 操作 */
+
+.rail {
+  display: grid;
+  gap: 12px;
+  position: sticky;
+  top: 24px;
+}
+
+.card {
+  padding: 18px;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+}
+
+.card label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 17px;
+  letter-spacing: 0.06em;
+}
+
+#idForm button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px 14px;
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#idForm button:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.seat-label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.seat {
+  margin: 2px 0 16px;
+  font-family: var(--mono);
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+}
+
+.actions {
+  display: grid;
+  gap: 8px;
+}
+
+.actions .q {
+  border-color: var(--question);
+  color: var(--question);
+}
+
+.actions .q:hover {
+  background: var(--question);
+  color: var(--paper);
+}
+
+.actions .r {
+  border-color: var(--review);
+  color: var(--review);
+}
+
+.actions .r:hover {
+  background: var(--review);
+  color: var(--paper);
+}
+
+.actions .ghost {
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+
+.actions .ghost:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.status {
+  margin: 14px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.status:empty {
+  display: none;
+}
+
+.link {
+  margin-top: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link:hover {
+  color: var(--ink);
+}
+
+.err {
+  margin: 0;
+  color: var(--question);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.err:empty {
+  display: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--review);
+  outline-offset: 2px;
+}
+
+/* 案内 */
+
+dialog {
+  max-width: 480px;
+  padding: 22px;
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+}
+
+dialog::backdrop {
+  background: rgba(22, 24, 29, 0.45);
+}
+
+dialog h2 {
+  margin: 0 0 12px;
+  font-size: 17px;
+}
+
+dialog ul {
+  margin: 0 0 18px;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .rail {
+    position: static;
+    order: -1;
+  }
+
+  .top {
+    padding: 14px 16px;
+  }
+}
+
+/* 座席表そのものが狭くなったら、文字は入らないので色だけで伝える */
+@container (max-width: 700px) {
+  .desk .flags {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk {
+    transition: none;
+  }
+}
