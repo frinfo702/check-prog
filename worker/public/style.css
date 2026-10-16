@@ -38,7 +38,7 @@ body {
 
 .top {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 14px;
   padding: 16px 24px;
   border-bottom: 1.5px solid var(--ink);
@@ -91,8 +91,8 @@ body {
 }
 
 .repo svg {
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
   fill: currentColor;
 }
 
