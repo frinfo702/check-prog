@@ -30,9 +30,20 @@ for (const row of ROWS) {
     if (col === 10) el.classList.add("ta-seat");
     el.dataset.desk = desk;
     // Each desk is split into a left and a right seat
-    el.innerHTML = `<span class="half left" aria-hidden="true"><span class="flags"></span></span><span class="half right" aria-hidden="true"><span class="flags"></span></span><span class="name">${desk}</span>`;
+    el.innerHTML = `<span class="half left" aria-hidden="true"><span class="remain"></span><span class="flags"></span></span><span class="half right" aria-hidden="true"><span class="remain"></span><span class="flags"></span></span><span class="name">${desk}</span>`;
     mapEl.append(el);
   }
+}
+
+/** Time left before the call is withdrawn for you, as m:ss. */
+function fmtLeft(expiresAt) {
+  const left = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
+  return `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`;
+}
+
+/** The clock ticks every second, so leave every unchanged node alone. */
+function setText(el, text) {
+  if (el.textContent !== text) el.textContent = text;
 }
 
 function render() {
@@ -44,18 +55,34 @@ function render() {
       half.classList.toggle("q", Boolean(state?.question));
       half.classList.toggle("c", Boolean(state?.check));
       half.classList.toggle("mine", seat === mySeat);
-      half.querySelector(".flags").textContent = state
-        ? [state.question && "質問", state.check && "チェック"]
-            .filter(Boolean)
-            .join("\n")
-        : "";
+      setText(
+        half.querySelector(".flags"),
+        state
+          ? [state.question && "質問", state.check && "チェック"]
+              .filter(Boolean)
+              .join("\n")
+          : "",
+      );
+      // Shown on the map too, so it reads before a student ID is entered
+      setText(
+        half.querySelector(".remain"),
+        state ? fmtLeft(state.expiresAt) : "",
+      );
     }
   }
   const mine = raised[mySeat];
-  statusEl.textContent = mine
-    ? `この席は ${[mine.question && "質問", mine.check && "チェック"].filter(Boolean).join(" と ")} で呼び出し中です。`
-    : "";
+  setText(
+    statusEl,
+    mine
+      ? `この席は ${[mine.question && "質問", mine.check && "チェック"].filter(Boolean).join(" と ")} で呼び出し中です。あと ${fmtLeft(mine.expiresAt)} で自動的に取り下げられます。`
+      : "",
+  );
 }
+
+// The server withdraws expired calls on its own; the client just ticks the clocks
+setInterval(() => {
+  if (Object.keys(raised).length) render();
+}, 1000);
 
 function showError(message) {
   errEl.textContent = message;

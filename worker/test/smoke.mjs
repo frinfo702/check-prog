@@ -99,6 +99,23 @@ const clearedLeft = await mine.nextState();
 assert(!(leftSeat in clearedLeft.raised), "左の取り下げが反映される");
 await other.nextState();
 
+// 時間切れの自動取り下げ。待てるのは HAND_TTL_MS を短くした dev だけなので、長いときは飛ばす
+mine.send({ type: "raise", student_id: leftId, kind: "check" });
+const ticking = await mine.nextState();
+const expiresAt = ticking.raised[leftSeat]?.expiresAt;
+assert(typeof expiresAt === "number", "挙手に自動取り下げの期限が付く");
+await other.nextState();
+
+if (expiresAt - Date.now() > 3000) {
+  console.log(
+    `skip: 時間切れの自動取り下げ（期限まで約 ${Math.round((expiresAt - Date.now()) / 1000)} 秒。HAND_TTL_MS を短くした dev なら確認できる）`,
+  );
+  mine.send({ type: "withdraw", student_id: leftId });
+}
+const expired = await mine.nextState();
+assert(!(leftSeat in expired.raised), "時間切れの挙手は自動的に取り下げられる");
+assert(!((await other.nextState()).raised[leftSeat]), "自動取り下げが他のブラウザにも届く");
+
 mine.ws.close();
 other.ws.close();
 console.log("すべて確認しました");

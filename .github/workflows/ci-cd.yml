@@ -52,7 +52,8 @@ jobs:
       - name: devを起動してスモークテスト
         working-directory: worker
         run: |
-          npx wrangler dev --port 8787 &
+          # HAND_TTL_MS を短くして、自動取り下げもテスト中に確認する
+          npx wrangler dev --port 8787 --var HAND_TTL_MS:1000 &
           for _ in $(seq 60); do
             curl -fsS http://127.0.0.1:8787/ > /dev/null && break
             sleep 1

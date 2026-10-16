@@ -6,6 +6,6 @@ A seat map for Programming Exercise 1 (F1) to find your seat and call a TA.
 
 1. Enter your student ID. The seat map marks your seat.
 2. Press 質問で呼ぶ for a question, or チェックで呼ぶ for a check.
-3. Your seat lights up on the map in every browser, so a TA or a supporter can see who is waiting. Press 取り下げ to withdraw the call.
+3. Your seat lights up on the map in every browser, so a TA or a supporter can see who is waiting. Press 取り下げ to withdraw the call, or wait: every seat shows the time left before its call is taken down on its own, five minutes after the last raise.
 
 Your student ID is only used to find your seat, and is never stored on the server.
