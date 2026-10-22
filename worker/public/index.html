@@ -10,93 +10,194 @@
   <body>
     <header class="top">
       <h1>
-        <span class="code">プログラミング演習1 (F1)</span>チェック呼び出し
+        <span class="code" data-i18n="app.code">プログラミング演習1 (F1)</span
+        ><span data-i18n="app.name">チェック呼び出し</span>
       </h1>
-      <button id="infoButton" aria-label="学籍番号の扱いについて">i</button>
-      <a
-        class="repo"
-        href="https://github.com/frinfo702/check-prog"
-        target="_blank"
-        rel="noopener"
-        title="GitHub リポジトリ"
-        aria-label="GitHub リポジトリ"
-      >
-        <svg viewBox="0 0 16 16" aria-hidden="true">
-          <path
-            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
-          />
-        </svg>
-      </a>
+      <div class="top-tools">
+        <div
+          class="lang"
+          role="group"
+          data-active="ja"
+          data-i18n-aria-label="lang.label"
+          aria-label="表示言語"
+        >
+          <span class="lang-thumb" aria-hidden="true"></span>
+          <button
+            type="button"
+            data-lang="ja"
+            lang="ja"
+            aria-label="日本語"
+            aria-pressed="true"
+          >
+            JA
+          </button>
+          <button
+            type="button"
+            data-lang="zh"
+            lang="zh"
+            aria-label="中文"
+            aria-pressed="false"
+          >
+            中文
+          </button>
+          <button
+            type="button"
+            data-lang="en"
+            lang="en"
+            aria-label="English"
+            aria-pressed="false"
+          >
+            EN
+          </button>
+        </div>
+        <a
+          class="repo"
+          href="https://github.com/frinfo702/check-prog"
+          target="_blank"
+          rel="noopener"
+          data-i18n-title="header.repo"
+          data-i18n-aria-label="header.repo"
+          title="GitHub リポジトリ"
+          aria-label="GitHub リポジトリ"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+            />
+          </svg>
+        </a>
+        <button
+          id="infoButton"
+          data-i18n-aria-label="header.info"
+          aria-label="学籍番号の扱いについて"
+        >
+          i
+        </button>
+      </div>
     </header>
 
     <div class="layout">
       <main class="plan">
         <div class="plan-head">
-          <span class="wall-label">窓側</span>
+          <span class="wall-label" data-i18n="room.window">窓側</span>
           <span class="legend">
-            <i class="swatch q"></i>質問 <i class="swatch c"></i>チェック
+            <i class="swatch q"></i><span data-i18n="flag.question">質問</span>
+            <i class="swatch c"></i><span data-i18n="flag.check">チェック</span>
           </span>
         </div>
 
         <div class="window-bar" aria-hidden="true"></div>
 
         <div class="map-scroll">
-          <div id="map" class="map" aria-label="座席表"></div>
+          <div
+            id="map"
+            class="map"
+            data-i18n-aria-label="map.label"
+            aria-label="座席表"
+          ></div>
         </div>
 
         <div class="corridor">
-          <span class="wall-label">廊下側</span>
-          <span class="ta">TA席</span>
+          <span class="wall-label" data-i18n="room.corridor">廊下側</span>
+          <span class="ta" data-i18n="room.ta">TA席</span>
         </div>
       </main>
 
       <aside class="rail">
         <form id="idForm" class="card">
-          <label for="sid">学籍番号</label>
+          <label for="sid" data-i18n="form.id">学籍番号</label>
           <input
             id="sid"
             inputmode="numeric"
             autocomplete="off"
             placeholder="26002123456"
           />
-          <button type="submit">自分の席を表示</button>
+          <button type="submit" data-i18n="form.show">自分の席を表示</button>
         </form>
 
         <p id="err" class="err" role="alert"></p>
 
         <div id="me" class="card" hidden>
-          <p class="seat-label">あなたの席</p>
+          <p class="seat-label" data-i18n="seat.label">あなたの席</p>
           <p class="seat">
             <strong id="myDesk"></strong><span id="mySide" class="side"></span>
           </p>
 
           <div class="actions">
-            <button id="raiseQuestion" class="q">質問で呼ぶ</button>
-            <button id="raiseCheck" class="c">チェックで呼ぶ</button>
-            <button id="withdraw" class="ghost">取り下げ</button>
+            <button id="raiseQuestion" class="q" data-i18n="action.question">
+              質問で呼ぶ
+            </button>
+            <button id="raiseCheck" class="c" data-i18n="action.check">
+              チェックで呼ぶ
+            </button>
+            <button id="withdraw" class="ghost" data-i18n="action.withdraw">
+              取り下げ
+            </button>
           </div>
 
           <p id="status" class="status"></p>
-          <button id="reset" class="link">学籍番号を入力し直す</button>
+          <button id="reset" class="link" data-i18n="form.reset">
+            学籍番号を入力し直す
+          </button>
         </div>
       </aside>
     </div>
 
     <dialog id="infoDialog">
-      <h2>学籍番号の扱い</h2>
+      <div class="dialog-head">
+        <h2 data-i18n="info.title">学籍番号の扱い</h2>
+        <div
+          class="lang lang-dialog"
+          role="group"
+          data-active="ja"
+          data-i18n-aria-label="lang.label"
+          aria-label="表示言語"
+        >
+          <span class="lang-thumb" aria-hidden="true"></span>
+          <button
+            type="button"
+            data-lang="ja"
+            lang="ja"
+            aria-label="日本語"
+            aria-pressed="true"
+          >
+            JA
+          </button>
+          <button
+            type="button"
+            data-lang="zh"
+            lang="zh"
+            aria-label="中文"
+            aria-pressed="false"
+          >
+            中文
+          </button>
+          <button
+            type="button"
+            data-lang="en"
+            lang="en"
+            aria-label="English"
+            aria-pressed="false"
+          >
+            EN
+          </button>
+        </div>
+      </div>
       <ul>
-        <li>
+        <li data-i18n="info.p1">
           学籍番号は、あなたの席を照合するためだけに使います。サーバーには保存しません。
         </li>
-        <li>他の学生に、あなたの学籍番号が見えることはありません。</li>
-        <li>
+        <li data-i18n="info.p2">
+          他の学生に、あなたの学籍番号が見えることはありません。
+        </li>
+        <li data-i18n="info.p3">
           学籍番号はMoodleから取得したもので、この授業の運営以外には使用しません。
         </li>
-        <li>
+        <li data-i18n="info.p4">
           入力した学籍番号は、このブラウザの中に暗号化して保存され、次回の入力が不要になります。
         </li>
       </ul>
-      <button id="infoClose">閉じる</button>
+      <button id="infoClose" data-i18n="info.close">閉じる</button>
     </dialog>
 
     <script src="app.js"></script>

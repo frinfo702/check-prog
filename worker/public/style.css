@@ -20,6 +20,17 @@
   --mono: ui-monospace, "SF Mono", Menlo, "Roboto Mono", monospace;
 }
 
+/* Let each language use its own CJK glyphs and Latin type */
+html[lang="zh"] {
+  --font: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans SC", sans-serif;
+}
+
+html[lang="en"] {
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -38,17 +49,21 @@ body {
 
 .top {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
+  gap: 10px 14px;
   padding: 16px 24px;
   border-bottom: 1.5px solid var(--ink);
   background: var(--paper);
 }
 
 .top h1 {
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
   font-size: 19px;
   font-weight: 700;
+  line-height: 1.35;
   letter-spacing: 0.01em;
 }
 
@@ -77,11 +92,81 @@ body {
   color: var(--paper);
 }
 
-/* Repository link, pushed to the right end of the header */
+/* Language switch. The ink block is the selected language, like a stamped cell. */
+.top-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.lang {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  isolation: isolate;
+}
+
+.lang-thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(100% / 3);
+  background: var(--ink);
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lang[data-active="zh"] .lang-thumb {
+  transform: translateX(100%);
+}
+
+.lang[data-active="en"] .lang-thumb {
+  transform: translateX(200%);
+}
+
+.lang.no-transition .lang-thumb {
+  transition: none;
+}
+
+.lang button {
+  position: relative;
+  z-index: 1;
+  min-width: 42px;
+  padding: 5px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  transition: color 0.18s ease;
+}
+
+.lang button[lang="zh"] {
+  font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei",
+    sans-serif;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.lang button:hover {
+  color: var(--ink);
+}
+
+.lang button[aria-pressed="true"],
+.lang button[aria-pressed="true"]:hover {
+  color: var(--paper);
+}
+
+/* GitHub mark at the right end of the tools */
 .repo {
   display: inline-flex;
   align-items: center;
-  margin-left: auto;
   color: var(--ink-soft);
   text-decoration: none;
 }
@@ -114,9 +199,10 @@ body {
 
 .plan-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px 12px;
   margin-bottom: 8px;
 }
 
@@ -130,6 +216,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
   font-size: 12px;
   color: var(--ink-soft);
 }
@@ -500,6 +587,29 @@ dialog h2 {
   font-size: 17px;
 }
 
+.dialog-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 12px;
+}
+
+.dialog-head h2 {
+  margin: 0;
+}
+
+.lang-dialog button {
+  min-width: 34px;
+  padding: 3px 6px;
+  font-size: 10px;
+}
+
+.lang-dialog button[lang="zh"] {
+  font-size: 11px;
+}
+
 dialog ul {
   margin: 0 0 18px;
   padding-left: 20px;
@@ -524,6 +634,33 @@ dialog ul {
   }
 }
 
+@media (max-width: 560px) {
+  .top h1 {
+    flex-basis: 100%;
+    font-size: 16px;
+  }
+
+  .top .code {
+    margin-right: 7px;
+  }
+
+  .lang button {
+    min-width: 36px;
+    padding: 4px 6px;
+  }
+}
+
+/* The leading space in the English title keeps the accessible text spaced */
+html[lang="en"] .top .code {
+  margin-right: 5px;
+}
+
+/* English seat flags are longer than the Japanese and Chinese labels */
+html[lang="en"] .desk .flags {
+  font-size: clamp(7px, 0.8vw, 10px);
+  letter-spacing: 0;
+}
+
 /* Narrow seats cannot fit labels, so color alone carries the state */
 @container (max-width: 1100px) {
   .desk .flags {
@@ -539,7 +676,9 @@ dialog ul {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .desk {
+  .desk,
+  .lang-thumb,
+  .lang button {
     transition: none;
   }
 }
